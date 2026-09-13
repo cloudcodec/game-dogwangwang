@@ -47,7 +47,8 @@
 			"target": [
 				"dmg"
 			],
-			"category": "public.app-category.education"
+			"category": "public.app-category.education",
+			"signingIdentity": "-"
 		},
 		"publish": {
 			"provider": "github",
