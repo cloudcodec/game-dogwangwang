@@ -51,6 +51,9 @@
 		},
 		"publish": {
 			"provider": "github",
+			"owner": "cloudcodec",
+			"repo": "game-dogwangwang",
+			"releaseType": "release",
 			"publishAutoUpdate": false
 		},
 		"dmg": {
