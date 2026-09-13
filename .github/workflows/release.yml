@@ -32,7 +32,9 @@ jobs:
           node-version: 24
           cache: npm
 
-      - run: npm ci
+      # npm install 而不是 npm ci：不同 runner 的 npm 版本对 lock 的同步校验
+      # 不一致，npm ci 会直接以 EUSAGE 退出（CI 上已经踩到过）
+      - run: npm install --no-audit --no-fund
 
       # 生成图标（脚本在非 darwin 上会自己跳过）
       - run: npm run assets
