@@ -49,7 +49,12 @@
 			],
 			"category": "public.app-category.education"
 		},
+		"publish": {
+			"provider": "github",
+			"publishAutoUpdate": false
+		},
 		"dmg": {
+			"writeUpdateInfo": false,
 			"iconSize": 128,
 			"contents": [
 				{
