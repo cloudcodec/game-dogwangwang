@@ -32,10 +32,12 @@ jobs:
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
-      - run: npm ci
+      # 用 npm install 而不是 npm ci：lock 里只记录了本机的 rollup / esbuild
+      # 原生包，npm ci 在 Windows 上装不到 @rollup/rollup-win32-x64-msvc
+      - run: npm install --no-audit --no-fund
 
       # 生成图标（脚本在非 darwin 上会自己跳过）
       - run: npm run assets
