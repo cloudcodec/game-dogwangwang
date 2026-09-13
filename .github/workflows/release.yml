@@ -1,6 +1,6 @@
 name: release
 
-# 在 GitHub 上发布 release 时，打包三个平台的安装包并上传到该 release
+# 在 GitHub 上发布 release 时，打包 mac 两个架构的安装包并上传到该 release
 on:
   release:
     types: [published]
@@ -22,9 +22,6 @@ jobs:
           - os: macos-14
             platform: mac
             arch: x64
-          - os: windows-latest
-            platform: win
-            arch: x64
 
     steps:
       # 第三方 action 按 commit hash 固定，后面的注释是对应的版本
@@ -35,9 +32,7 @@ jobs:
           node-version: 24
           cache: npm
 
-      # 用 npm install 而不是 npm ci：lock 里只记录了本机的 rollup / esbuild
-      # 原生包，npm ci 在 Windows 上装不到 @rollup/rollup-win32-x64-msvc
-      - run: npm install --no-audit --no-fund
+      - run: npm ci
 
       # 生成图标（脚本在非 darwin 上会自己跳过）
       - run: npm run assets

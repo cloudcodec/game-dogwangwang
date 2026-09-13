@@ -49,11 +49,6 @@
 			],
 			"category": "public.app-category.education"
 		},
-		"win": {
-			"target": [
-				"nsis"
-			]
-		},
 		"dmg": {
 			"iconSize": 128,
 			"contents": [

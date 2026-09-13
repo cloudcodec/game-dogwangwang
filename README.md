@@ -73,9 +73,8 @@ dmg 里图标和 Applications 的位置写在 `package.json` 的 `build.dmg.cont
 | --- | --- |
 | `...-mac-arm64.dmg` | macOS Apple Silicon |
 | `...-mac-x64.dmg` | macOS Intel |
-| `...-win-x64.exe` | Windows 64 位（nsis 安装包） |
 
-产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。两个已知限制：没有签名证书，mac 版首次打开要右键「打开」；Windows 版没有自定义图标（`scripts/make-assets.js` 只在 macOS 上渲染图标）。
+产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。没有配置签名证书，所以首次打开需要右键「打开」。
 
 ## 产物与临时文件
 
