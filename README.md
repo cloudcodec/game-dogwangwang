@@ -52,7 +52,7 @@ dev 下 electron-vite 会注入 `ELECTRON_RENDERER_URL`，主进程用它走 dev
 - 起音气流：16ms 的宽频噪声（2.4kHz → 900Hz），「汪」的爆破感来自这里
 - 包络：3ms 起音 + 25ms 饱满段 + 指数收尾；另有约 45% 概率连叫两声
 
-调参要点：**时长和收尾是「汪」和「呜」的分界线**。`BARK_MS` 超过 ~0.2s、`F0_DROP` 掉得太低（缓降）、或 `NOISE_LEVEL` 太小（没有爆破），都会从「汪」滑向「呜」或电子音。
+调参要点：**时长和收尾是「汪」和「呜」的分界线**。`BARK_MS` 超过 ~0.2s、`F0_DROP` 掉得太低（缓降）、或 `NOISE_LEVEL` 太小（没有爆破），都会从「汪」变「呜」。
 
 ## 打包
 
@@ -74,7 +74,29 @@ dmg 里图标和 Applications 的位置写在 `package.json` 的 `build.dmg.cont
 | `...-mac-arm64.dmg` | macOS Apple Silicon |
 | `...-mac-x64.dmg` | macOS Intel |
 
-产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。没有配置签名证书，所以首次打开需要右键「打开」。
+产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。
+
+### macOS 安装说明
+
+应用未经代码签名，首次打开时 macOS 可能会提示"已损坏，无法打开"。解决方法有两种：
+
+#### 方法 1：命令行解除隔离属性（推荐）
+
+打开终端，执行以下命令：
+
+```bash
+sudo xattr -rd com.apple.quarantine /Applications/game-dogwangwang.app
+```
+
+然后就可以正常打开应用。
+
+#### 方法 2：使用右键菜单
+
+1. 打开 Finder，找到应用
+2. 右键选择"打开"
+3. 在弹出窗口中点击"打开"确认
+
+之后就不会再提示。
 
 ## 产物与临时文件
 
