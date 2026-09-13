@@ -1,0 +1,52 @@
+name: release
+
+# 在 GitHub 上发布 release 时，打包三个平台的安装包并上传到该 release
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # mac 两个架构都在 arm64 机器上打：electron-builder 会自己下载对应架构的 Electron
+          - os: macos-14
+            platform: mac
+            arch: arm64
+          - os: macos-14
+            platform: mac
+            arch: x64
+          - os: windows-latest
+            platform: win
+            arch: x64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # 生成图标（脚本在非 darwin 上会自己跳过）
+      - run: npm run assets
+
+      - run: npm run typecheck
+
+      - run: npx electron-vite build
+
+      # --publish always 把产物传到触发这条流水线的 release
+      - name: Package and upload to release
+        run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }} --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 没有签名证书，别让 electron-builder 去找
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"

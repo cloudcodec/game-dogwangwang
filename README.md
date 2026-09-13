@@ -65,6 +65,18 @@ dev 下 electron-vite 会注入 `ELECTRON_RENDERER_URL`，主进程用它走 dev
 
 dmg 里图标和 Applications 的位置写在 `package.json` 的 `build.dmg.contents` 里（用的是 electron-builder 默认窗口 540×380，没有自定义背景图）。
 
+## 发布
+
+在 GitHub 上发一个 release（网页点 Publish，或 `gh release create v1.0.0`），`.github/workflows/release.yml` 会自动打包并上传到该 release：
+
+| 产物 | 平台 |
+| --- | --- |
+| `...-mac-arm64.dmg` | macOS Apple Silicon |
+| `...-mac-x64.dmg` | macOS Intel |
+| `...-win-x64.exe` | Windows 64 位（nsis 安装包） |
+
+产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。两个已知限制：没有签名证书，mac 版首次打开要右键「打开」；Windows 版没有自定义图标（`scripts/make-assets.ts` 只在 macOS 上渲染图标）。
+
 ## 产物与临时文件
 
 - `out/` — electron-vite 构建输出（`out/main`、`out/renderer`）
