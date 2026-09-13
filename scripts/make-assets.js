@@ -5,9 +5,9 @@ import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
 
-function run(cmd: string[], cwd = root): string {
+function run(cmd, cwd = root) {
 	const [file, ...args] = cmd;
-	const proc = spawnSync(file as string, args, { cwd, encoding: "utf8" });
+	const proc = spawnSync(String(file), args, { cwd, encoding: "utf8" });
 	if (proc.error) {
 		throw new Error(`命令无法执行: ${cmd.join(" ")}\n${proc.error.message}`);
 	}
@@ -34,7 +34,7 @@ run(["swift", renderIcon, masterPng]);
 const iconsetPath = path.join(tmpDir, "icon.iconset");
 fs.mkdirSync(iconsetPath, { recursive: true });
 
-const sizes: Array<[number, number]> = [
+const sizes = [
 	[16, 16],
 	[32, 16],
 	[32, 32],

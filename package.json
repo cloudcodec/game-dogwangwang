@@ -16,7 +16,7 @@
 		"dev": "electron-vite dev",
 		"start": "electron-vite preview",
 		"typecheck": "vue-tsc --noEmit",
-		"assets": "node scripts/make-assets.ts",
+		"assets": "node scripts/make-assets.js",
 		"prebuild": "npm run assets",
 		"build": "npm run typecheck && electron-vite build && electron-builder --mac",
 		"build:dir": "npm run typecheck && electron-vite build && electron-builder --dir"

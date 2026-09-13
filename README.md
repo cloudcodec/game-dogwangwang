@@ -58,7 +58,7 @@ dev 下 electron-vite 会注入 `ELECTRON_RENDERER_URL`，主进程用它走 dev
 
 `npm run build` 依次做：
 
-1. `npm run assets` — `scripts/make-assets.ts` 用 swift 渲染主图标，sips 缩放 + `iconutil` 合成 `build/icon.icns`
+1. `npm run assets` — `scripts/make-assets.js` 用 swift 渲染主图标，sips 缩放 + `iconutil` 合成 `build/icon.icns`
 2. `npm run typecheck` — `vue-tsc --noEmit`
 3. `electron-vite build` — 输出到 `out/`
 4. `electron-builder --mac` — 打 dmg 到 `dist/`
@@ -75,7 +75,7 @@ dmg 里图标和 Applications 的位置写在 `package.json` 的 `build.dmg.cont
 | `...-mac-x64.dmg` | macOS Intel |
 | `...-win-x64.exe` | Windows 64 位（nsis 安装包） |
 
-产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。两个已知限制：没有签名证书，mac 版首次打开要右键「打开」；Windows 版没有自定义图标（`scripts/make-assets.ts` 只在 macOS 上渲染图标）。
+产物名由 `package.json` 的 `build.artifactName` 决定（`${name}-${version}-${os}-${arch}.${ext}`）。两个已知限制：没有签名证书，mac 版首次打开要右键「打开」；Windows 版没有自定义图标（`scripts/make-assets.js` 只在 macOS 上渲染图标）。
 
 ## 产物与临时文件
 
