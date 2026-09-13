@@ -1,0 +1,73 @@
+{
+	"name": "game-dogwangwang",
+	"version": "1.0.0",
+	"type": "module",
+	"description": "给小朋友玩的桌面小游戏：小狗汪汪",
+	"main": "./out/main/index.js",
+	"author": "cloudcodec",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cloudcodec/game-dogwangwang.git"
+	},
+	"homepage": "https://github.com/cloudcodec/game-dogwangwang",
+	"bugs": "https://github.com/cloudcodec/game-dogwangwang/issues",
+	"scripts": {
+		"dev": "electron-vite dev",
+		"start": "electron-vite preview",
+		"typecheck": "vue-tsc --noEmit",
+		"assets": "node scripts/make-assets.ts",
+		"prebuild": "npm run assets",
+		"build": "npm run typecheck && electron-vite build && electron-builder --mac",
+		"build:dir": "npm run typecheck && electron-vite build && electron-builder --dir"
+	},
+	"devDependencies": {
+		"@types/node": "^22.20.2",
+		"@vitejs/plugin-vue": "^5.2.1",
+		"electron": "^44.3.0",
+		"electron-builder": "^26.15.3",
+		"electron-vite": "^5.0.0",
+		"typescript": "^5.7.2",
+		"vite": "^6.0.3",
+		"vue": "^3.5.13",
+		"vue-tsc": "^2.2.0"
+	},
+	"build": {
+		"appId": "com.github.cloudcodec.dogwangwang",
+		"productName": "game-dogwangwang",
+		"files": [
+			"out/**"
+		],
+		"directories": {
+			"buildResources": "build",
+			"output": "dist"
+		},
+		"mac": {
+			"target": [
+				{
+					"target": "dmg",
+					"arch": [
+						"arm64"
+					]
+				}
+			],
+			"category": "public.app-category.education"
+		},
+		"dmg": {
+			"iconSize": 128,
+			"contents": [
+				{
+					"x": 140,
+					"y": 190,
+					"type": "file"
+				},
+				{
+					"x": 400,
+					"y": 190,
+					"type": "link",
+					"path": "/Applications"
+				}
+			]
+		}
+	}
+}
