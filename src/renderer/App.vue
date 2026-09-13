@@ -18,6 +18,10 @@ const SPRITES = ["🐾", "❤️", "🎵", "🦴", "✨", "💛"];
 const FIREWORK_EVERY = 10;
 /** 烟花从地面升到炸点要多久，爆炸的延迟跟它对齐 */
 const LAUNCH_MS = 900;
+/** 爆炸闪光时长 */
+const FLASH_MS = 1000;
+/** 火星飞散时长，爆炸元素就是靠它延迟出场 */
+const BURST_MS = 2400;
 const SPARK_SLOTS = 16;
 
 /** 天上的 ✨，启动时随机撒一次，之后靠 CSS 一直闪 */
@@ -111,7 +115,8 @@ function spawnFireworks(): void {
 			y: 12 + Math.random() * 22,
 			hue: Math.floor(Math.random() * 360),
 		},
-		LAUNCH_MS + 1500,
+		// 升空 + 火星飞散都结束才回收
+		LAUNCH_MS + BURST_MS + 200,
 	);
 }
 
@@ -232,7 +237,12 @@ onBeforeUnmount(() => {
 				v-for="b in bursts"
 				:key="b.id"
 				class="burst"
-				:style="{ '--hue': b.hue, '--launch': `${LAUNCH_MS}ms` }"
+				:style="{
+					'--hue': b.hue,
+					'--launch': `${LAUNCH_MS}ms`,
+					'--flash': `${FLASH_MS}ms`,
+					'--burst': `${BURST_MS}ms`,
+				}"
 			>
 				<span
 					class="rocket"
@@ -249,7 +259,7 @@ onBeforeUnmount(() => {
 						class="spark"
 						:style="{
 							'--angle': `${(s - 1) * (360 / SPARK_SLOTS)}deg`,
-							'--dist': `${s % 2 ? 132 : 88}px`,
+							'--dist': `${s % 2 ? 240 : 160}px`,
 						}"
 					/>
 				</div>
@@ -347,24 +357,38 @@ onBeforeUnmount(() => {
 .rocket {
 	position: absolute;
 	bottom: 100px;
-	width: 9px;
-	height: 9px;
-	margin-left: -4px;
+	width: 17px;
+	height: 17px;
+	margin-left: -8px;
 	border-radius: 50%;
-	background: #fff8d8;
-	box-shadow: 0 0 14px hsl(var(--hue) 95% 65%);
-	animation: rise var(--launch) cubic-bezier(0.35, 0, 0.55, 1) both;
+	background: radial-gradient(
+		circle,
+		#fff 0%,
+		#fff6c9 52%,
+		hsl(var(--hue) 95% 64%) 100%
+	);
+	box-shadow: 0 0 26px 7px hsl(var(--hue) 95% 62%);
+	animation:
+		rise var(--launch) cubic-bezier(0.35, 0, 0.55, 1) both,
+		flicker 0.16s steps(2, end) infinite;
 }
+/* 拖在火球后面的尾焰，让上升轨迹看得见 */
 .rocket::after {
 	content: "";
 	position: absolute;
 	left: 50%;
 	top: 100%;
-	width: 3px;
-	height: 30px;
-	margin-left: -1.5px;
+	width: 7px;
+	height: 78px;
+	margin-left: -3.5px;
 	border-radius: 999px;
-	background: linear-gradient(hsl(var(--hue) 95% 70%), transparent);
+	background: linear-gradient(
+		hsl(var(--hue) 95% 72%),
+		rgba(255, 190, 70, 0)
+	);
+	filter: blur(1px);
+	transform-origin: 50% 0;
+	animation: tail 0.22s ease-in-out infinite alternate;
 }
 
 .boom {
@@ -387,19 +411,20 @@ onBeforeUnmount(() => {
 		transparent 70%
 	);
 	transform: translate(-50%, -50%);
-	animation: flash 0.5s ease-out var(--launch) both;
+	animation: flash var(--flash) ease-out var(--launch) both;
 }
 
 .spark {
 	position: absolute;
-	left: -5px;
-	top: -5px;
-	width: 10px;
-	height: 10px;
+	left: -8px;
+	top: -8px;
+	width: 16px;
+	height: 16px;
 	border-radius: 50%;
 	background: hsl(var(--hue) 95% 62%);
-	box-shadow: 0 0 12px hsl(var(--hue) 95% 60%);
-	animation: spark-fly 1.2s cubic-bezier(0.15, 0.7, 0.3, 1) var(--launch) both;
+	box-shadow: 0 0 20px hsl(var(--hue) 95% 58%);
+	animation: spark-fly var(--burst) cubic-bezier(0.15, 0.7, 0.3, 1)
+		var(--launch) both;
 }
 
 .cloud {
@@ -828,29 +853,49 @@ onBeforeUnmount(() => {
 		height: 0;
 		opacity: 0;
 	}
-	30% {
-		width: 220px;
-		height: 220px;
-		opacity: 0.9;
+	25% {
+		width: 340px;
+		height: 340px;
+		opacity: 0.95;
 	}
 	100% {
-		width: 320px;
-		height: 320px;
+		width: 520px;
+		height: 520px;
 		opacity: 0;
 	}
 }
 
 @keyframes spark-fly {
 	0% {
-		transform: rotate(var(--angle)) translateX(0) scale(0.2);
+		transform: rotate(var(--angle)) translateX(0) scale(0.25);
 		opacity: 0;
 	}
-	14% {
+	7% {
 		opacity: 1;
 	}
 	100% {
-		transform: rotate(var(--angle)) translateX(var(--dist)) scale(0.9);
+		transform: rotate(var(--angle)) translateX(var(--dist)) scale(1);
 		opacity: 0;
+	}
+}
+
+@keyframes flicker {
+	0% {
+		filter: brightness(1);
+	}
+	100% {
+		filter: brightness(1.5);
+	}
+}
+
+@keyframes tail {
+	0% {
+		transform: scaleY(0.8);
+		opacity: 0.7;
+	}
+	100% {
+		transform: scaleY(1.25);
+		opacity: 1;
 	}
 }
 
