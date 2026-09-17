@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { playBark } from "./bark";
 
 /** 反应动作和它对应的动画时长 */
 const REACTIONS = [
@@ -13,6 +12,19 @@ const REACTIONS = [
 
 const BUBBLES = ["汪!", "汪汪!", "嗷呜~", "汪汪汪!", "嗨!", "嗷~", "汪呜!"];
 const SPRITES = ["🐾", "❤️", "🎵", "🦴", "✨", "💛"];
+
+/** 狗叫录音：src/renderer/public/bark.mp3，构建后就在页面旁边 */
+const bark = new Audio(new URL("bark.mp3", document.baseURI).href);
+bark.preload = "auto";
+
+/** 汪一声。level 越大叫得越响。 */
+function playBark(level = 1): void {
+	bark.volume = level;
+	bark.currentTime = 0;
+	void bark.play().catch(() => {
+		// 自动播放策略拦下来就算了，不影响交互
+	});
+}
 
 /** 每满这么多次汪汪，放一次烟花 */
 const FIREWORK_EVERY = 10;

@@ -28,7 +28,8 @@ npx vue-tsc --noEmit     # 类型检查
   - 重播 CSS 动画要先移除 class、强制回流（`replay()`），否则连续触发不会重新播放
   - 反应状态挂在 `.dog` 上的 `is-jump` / `is-spin` / ... class，CSS 用 `.dog[class*="is-"]` 匹配
   - 指针跟随通过 `--look-x` / `--look-y` 两个 CSS 变量传递
-- `src/renderer/bark.ts` — 狗叫合成。改参数前先看 README 的「声音是怎么来的」，别把 `BARK_MS` 调大，超过 ~0.2s 就会从「汪」变成「呜」。
+- 狗叫是**直接播录音**不是合成的：`App.vue` 里一个 `Audio` 元素 `play()` 就完事，素材是 `src/renderer/public/bark.mp3`（项目里唯一的音频资源）
+- `src/renderer/public/` — 会原样拷进 `out/renderer/`，放不需要打包处理的静态素材。引用它时路径要写成 `new URL("xxx", document.baseURI)`，否则生产环境（`file://`）会指向错地方。
 - `src/main/index.ts` — Electron 主进程：全屏窗口 + 中文菜单（⌘Q）。dev 下用 `ELECTRON_RENDERER_URL`（electron-vite 注入）走 dev server，否则 `loadFile` 读 `out/renderer/index.html`。
 - `electron.vite.config.ts` — 构建配置。renderer 的 `base` 必须是 `"./"`，否则 `file://` 加载时资源路径是绝对的会白屏。
 
@@ -42,4 +43,4 @@ npx vue-tsc --noEmit     # 类型检查
 
 - 不要提交 `out/`、`dist/`、`build/`（已在 `.gitignore`）
 - 不要因为改 UI 就引入 UI 库或额外依赖，这个项目的卖点就是零依赖的手写 CSS 动画
-- 不要往仓库里塞音频 / 图片素材，声音是实时合成的，图形是纯 CSS + emoji；`build/icon.icns` 由 `npm run assets` 用 swift 现场渲染
+- 不要往仓库里塞额外的音频 / 图片素材：声音只有 `src/renderer/public/bark.mp3` 这一个（录音，非合成），图形是纯 CSS + emoji；`build/icon.icns` 由 `npm run assets` 用 swift 现场渲染

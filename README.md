@@ -23,8 +23,8 @@ src/
   renderer/
     index.html        渲染进程入口
     main.ts           挂载 Vue 应用
-    App.vue           全部界面：场景、小狗、动画、交互
-    bark.ts           Web Audio 合成狗叫（无音频文件）
+    App.vue           全部界面：场景、小狗、动画、交互、狗叫播放
+    public/bark.mp3   狗叫素材，构建时原样拷到 out/renderer/
     app.css           全局基础样式
 electron.vite.config.ts  构建配置（main / renderer 两套，renderer 的 base 是 "./"）
 scripts/                 macOS 图标渲染脚本（swift，现场生成，不进仓库）
@@ -44,15 +44,22 @@ dev 下 electron-vite 会注入 `ELECTRON_RENDERER_URL`，主进程用它走 dev
 
 ## 声音是怎么来的
 
-`src/renderer/bark.ts` 用 Web Audio 实时合成，项目里没有任何音频文件。文件顶部是一组调音台常量，改叫声先动它们：
+直接用真实犬吠录音：`src/renderer/public/bark.mp3`（0.57s，44.1kHz 立体声）。构建时 Vite 把它原样拷到 `out/renderer/bark.mp3`，所以生产环境（`file://` 加载）和 dev server 都拿得到。
 
-- 声源：锯齿波（谐波）+ 低八度三角波（胸腔厚度），基频 ~540Hz，110ms 内下坠到 0.62 倍
-- 声带抖动：~46Hz 的振幅调制（深度 0.18），负责犬吠那股粗糙感，去掉就变电子音
-- 共振峰：两个 peaking 滤波器串起来（850Hz / 1550Hz），把音色钉在「啊/嗷」上；再高通切掉 220Hz 以下的糊音
-- 起音气流：16ms 的宽频噪声（2.4kHz → 900Hz），「汪」的爆破感来自这里
-- 包络：3ms 起音 + 25ms 饱满段 + 指数收尾；另有约 45% 概率连叫两声
+播放就放在 `App.vue` 里，一个 `<audio>` 元素从头播到尾，没有别的处理：
 
-调参要点：**时长和收尾是「汪」和「呜」的分界线**。`BARK_MS` 超过 ~0.2s、`F0_DROP` 掉得太低（缓降）、或 `NOISE_LEVEL` 太小（没有爆破），都会从「汪」变「呜」。
+```ts
+const bark = new Audio(new URL("bark.mp3", document.baseURI).href);
+bark.preload = "auto";
+
+function playBark(level = 1): void {
+	bark.volume = level;
+	bark.currentTime = 0; // 连点时从头重播
+	void bark.play().catch(() => {});
+}
+```
+
+URL 用 `new URL("bark.mp3", document.baseURI)` 拼，dev（`http://localhost:5173/`）和生产（`file://`）都能解析对。换素材就替换 `public/bark.mp3`（保持文件名），不用改代码。
 
 ## 打包
 
